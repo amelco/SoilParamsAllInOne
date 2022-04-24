@@ -3,6 +3,7 @@ using SoilParams.Extensions;
 using SoilParams.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SoilParams
 {
@@ -22,18 +23,33 @@ namespace SoilParams
         // TODO: Read input string in JSON format and add as a parameter in the constructor.
         //       Call a private method to read this JSON file to give values to
         //       PressureHeads, MeasuredWaterContents and InitialGuess
-        public WRCParams(List<double> initialGuess)
+        public WRCParams(string inputString)
         {
             WRCModel = ModelSimpleFactory.CreateModel(SoilModelEnum.VG);
-            InitialGuess = initialGuess;
+            ReadInputString(inputString);
         }
 
-        public WRCParams(SoilModelEnum model, List<double> initialGuess)
+        public WRCParams(SoilModelEnum model, string inputString)
         {
             WRCModel = ModelSimpleFactory.CreateModel(model);
-            InitialGuess = initialGuess;
+            ReadInputString(inputString);
         }
         
+        private void ReadInputString(string input)
+        {
+            try
+            {
+                var result = System.Text.Json.JsonSerializer.Deserialize<Input>(input);
+                PressureHeads = result.PressureHeads;
+                MeasuredWaterContents = result.MeasuredWaterContents;
+                InitialGuess = result.InitialGuess;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Invalid input file. Check the manual to generte a correct input file.\nError: " + e.Message);
+            }
+        }
+
         public string GetModelName()
         {
             return WRCModel.Name;
@@ -43,10 +59,19 @@ namespace SoilParams
         {
             if (WRCModel == null)
             {
-                throw new NullReferenceException("A model must be selected first");
+                throw new AppDomainUnloadedException("A model must be selected first");
             }
 
-            Params = WRCModel.GetParams(PressureHeads, MeasuredWaterContents, InitialGuess);
+            Params = WRCModel.CalculateParams(PressureHeads, MeasuredWaterContents, InitialGuess);
+        }
+
+        public void CalculateWaterContents()
+        {
+            if (Params.Count == 0)
+            {
+                throw new AppDomainUnloadedException("Model parameters does not exist. Try to run CalculateParams function first");
+            }
+            PredictedWaterContents = WRCModel.CalculatePredictedWaterContents(PressureHeads, Params.Values.ToList());
         }
 
         public void CalculateStatistics()

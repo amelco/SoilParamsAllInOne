@@ -29,7 +29,7 @@ namespace SoilParams.Models
             };
         }
 
-        public override Dictionary<string, double> GetParams(List<double> pressureHeads, List<double> measuredWaterContents, List<double> initialGuess)
+        public override Dictionary<string, double> CalculateParams(List<double> pressureHeads, List<double> measuredWaterContents, List<double> initialGuess)
         {
             var xValues = new DoubleVector(pressureHeads.ToArray());
             var yValues = new DoubleVector(measuredWaterContents.ToArray());
@@ -47,9 +47,17 @@ namespace SoilParams.Models
                 { "n",      parameters[3] }
             };
 
-            // CalculatePredictedWaterContents(fdelegate);
-            
             return soilParameters;
+        }
+
+        public override List<double> CalculatePredictedWaterContents(List<double> pressureHeads, List<double> parameters)
+        {
+            var predictedWaterContents = new List<double>();
+            foreach (var pressureHead in pressureHeads)
+            {
+                predictedWaterContents.Add(WrcFunction(new DoubleVector(parameters.ToArray()), (double)pressureHead));
+            }
+            return predictedWaterContents;
         }
 
         public override Dictionary<string, double> GetStats()

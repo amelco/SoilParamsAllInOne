@@ -14,7 +14,12 @@ namespace SoilParams.Models
         {
             Name = model.GetDescription();
         }
-        public override Dictionary<string, double> GetParams(List<double> pressureHeads, List<double> measuredWaterContents, List<double> initialGuess)
+        public override Dictionary<string, double> CalculateParams(List<double> pressureHeads, List<double> measuredWaterContents, List<double> initialGuess)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override List<double> CalculatePredictedWaterContents(List<double> pressureHeads, List<double> parameters)
         {
             throw new NotImplementedException();
         }
