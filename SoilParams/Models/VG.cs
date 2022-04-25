@@ -11,6 +11,8 @@ namespace SoilParams.Models
 {
     class VG : BaseModel
     {
+        private OneVariableFunctionFitter<TrustRegionMinimizer> fitter { get; set; }
+
         public VG(SoilModelEnum model)
         {
             Name = model.GetDescription();
@@ -27,6 +29,7 @@ namespace SoilParams.Models
                 var n      = parameters[3];
                 return thetaR + (thetaS - thetaR) / Math.Pow(1 + Math.Pow(alpha * h, n), 1-1/n);
             };
+            fitter = new OneVariableFunctionFitter<TrustRegionMinimizer>(WrcFunction);
         }
 
         public override Dictionary<string, double> CalculateParams(List<double> pressureHeads, List<double> measuredWaterContents, List<double> initialGuess)
@@ -34,8 +37,6 @@ namespace SoilParams.Models
             var xValues = new DoubleVector(pressureHeads.ToArray());
             var yValues = new DoubleVector(measuredWaterContents.ToArray());
             var start   = new DoubleVector(initialGuess.ToArray());
-
-            var fitter = new OneVariableFunctionFitter<TrustRegionMinimizer>(WrcFunction);
 
             DoubleVector parameters = fitter.Fit( xValues, yValues, start );
 
@@ -60,23 +61,23 @@ namespace SoilParams.Models
             return predictedWaterContents;
         }
 
-        public override Dictionary<string, double> GetStats()
+        public override Statistics GetStats(WRCParams model)
         {
-            Dictionary<string, double> stats = new();
+            Statistics stats = new Statistics();
 
-            // MeasuredStandardDeviation = NMathFunctions.StandardDeviation(yValues);
-            // MeasuredStandardError     = MeasuredStandardDeviation / Math.Sqrt(sample.MeasuredWaterContents.Count);
-            // SoilParameters.Add("Standard deviation (measured values)", MeasuredStandardDeviation);
-            // SoilParameters.Add("Standard error (measured values)",     MeasuredStandardError);
+            var stdDevM = NMathFunctions.StandardDeviation(model.MeasuredWaterContents.ToArray());
+            var stdErrM = stdDevM / Math.Sqrt(model.MeasuredWaterContents.Count);
+            var stdDevP = NMathFunctions.StandardDeviation(model.PredictedWaterContents.ToArray());
+            var stdErrP = stdDevP / Math.Sqrt(model.PredictedWaterContents.Count);
+            var corr = NMathFunctions.Correlation(new DoubleVector(model.MeasuredWaterContents.ToArray()), new DoubleVector(model.PredictedWaterContents.ToArray()));
+            var rsqd = new GoodnessOfFit(fitter, new DoubleVector(model.PressureHeads.ToArray()), new DoubleVector(model.MeasuredWaterContents.ToArray()), new DoubleVector(model.Params.Values.ToArray())).RSquared;
 
-            // var predictedWaterContents = new DoubleVector(sample.PredictedWaterContents.Select(x => (double)x).ToArray());
-            // PredictedStandardDeviation = NMathFunctions.StandardDeviation(predictedWaterContents);
-            // PredictedStandardError     = PredictedStandardDeviation / Math.Sqrt(sample.PredictedWaterContents.Count);
-            // SoilParameters.Add("Standard deviation (predicted values)", PredictedStandardDeviation);
-            // SoilParameters.Add("Standard error (predicted values)",     PredictedStandardError);
-
-            // Correlation = NMathFunctions.Correlation(yValues, predictedWaterContents);
-            // Rsquared = new GoodnessOfFit(fitter, xValues, yValues, parameters).RSquared;
+            stats.MeasuredStandardDeviation = stdDevM;
+            stats.MeasuredStandardError = stdErrM;
+            stats.PredictedStandardDeviation = stdDevP;
+            stats.PredictedStandardError = stdErrP;
+            stats.PearsonCorrelation = corr;
+            stats.Rsquared = rsqd;
 
             return stats;
 

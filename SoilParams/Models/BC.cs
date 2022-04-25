@@ -24,7 +24,7 @@ namespace SoilParams.Models
             throw new NotImplementedException();
         }
 
-        public override Dictionary<string, double> GetStats()
+        public override Statistics GetStats(WRCParams model)
         {
             throw new NotImplementedException();
         }

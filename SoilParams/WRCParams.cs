@@ -14,15 +14,10 @@ namespace SoilParams
         public List<double>               MeasuredWaterContents  { get; private set; } = new();
         public List<double>               PredictedWaterContents { get; private set; } = new();
         public Dictionary<string, double> Params                 { get; private set; } = new();
-        public double                     StandardDeviation      { get; private set; }
-        public double                     StandardError          { get; private set; }
-        public double                     Rsquared               { get; private set; }
         public List<double>               InitialGuess           { get; private set; }
+        public Statistics                 Stats                  { get; set; }
 
 
-        // TODO: Read input string in JSON format and add as a parameter in the constructor.
-        //       Call a private method to read this JSON file to give values to
-        //       PressureHeads, MeasuredWaterContents and InitialGuess
         public WRCParams(string inputString)
         {
             WRCModel = ModelSimpleFactory.CreateModel(SoilModelEnum.VG);
@@ -76,6 +71,7 @@ namespace SoilParams
 
         public void CalculateStatistics()
         {
+            Stats = WRCModel.GetStats(this);
 
         }
     }

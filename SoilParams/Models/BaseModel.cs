@@ -18,6 +18,6 @@ namespace SoilParams.Models
 
         public abstract Dictionary<string, double> CalculateParams(List<double> pressureHeads, List<double> measuredWaterContent, List<double> initialGuess);
         public abstract List<double> CalculatePredictedWaterContents(List<double> pressureHeads, List<double> parameters);
-        public abstract Dictionary<string, double> GetStats();
+        public abstract Statistics GetStats(WRCParams model);
     }
 }

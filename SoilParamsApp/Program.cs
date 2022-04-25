@@ -54,7 +54,17 @@ namespace SoilParamsApp
                     Console.WriteLine($"{sample.MeasuredWaterContents[i].ToString("0.0000"),8}, {p.ToString("0.0000"),9}");
                 }
             }
-
+            sample.CalculateStatistics();
+            if (sample.Stats != null)
+            {
+                Console.WriteLine(sample.Stats);
+                // Console.WriteLine(sample.Stats.MeasuredStandardDeviation);
+                // Console.WriteLine(sample.Stats.PredictedStandardDeviation);
+                // Console.WriteLine(sample.Stats.MeasuredStandardError);
+                // Console.WriteLine(sample.Stats.PredictedStandardError);
+                // Console.WriteLine(sample.Stats.PearsonCorrelation);
+                // Console.WriteLine(sample.Stats.Rsquared);
+            }
         }
     }
 }
