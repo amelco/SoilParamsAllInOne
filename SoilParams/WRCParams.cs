@@ -57,7 +57,8 @@ namespace SoilParams
                 throw new AppDomainUnloadedException("A model must be selected first");
             }
 
-            Params = WRCModel.CalculateParams(PressureHeads, MeasuredWaterContents, InitialGuess);
+            Params = WRCModel.CalculateParams(this);
+
         }
 
         public void CalculateWaterContents()
