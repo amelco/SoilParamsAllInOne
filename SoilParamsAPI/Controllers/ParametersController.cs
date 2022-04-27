@@ -34,10 +34,10 @@ namespace SoilParamsAPI.Controllers
         }
 
         [HttpPost]
-        public Result<string> Post([FromBody] object input)
+        public Result<OutputModel> Post([FromBody] InputQueryParameters input)
         {
-            var res = _service.CalculateParameters(input.ToString());
-            return new Result<string> { Value = res };
+            var res = _service.CalculateParameters(input);
+            return new Result<OutputModel> { Value = res };
 
         }
 
