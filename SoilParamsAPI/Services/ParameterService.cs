@@ -19,25 +19,31 @@ namespace SoilParamsAPI.Services
             {
                 res = this.Calculate(JsonSerializer.Serialize(input));
             }
-            catch 
+            catch (Exception e)
             {
-                return new Result<OutputModel> { Success = false, Value = null };
+                return new Result<OutputModel> { Success = false, Message = e.Message, Data = null };
             }
-            return new Result<OutputModel> { Value = res };
+            return new Result<OutputModel> { Data = res };
         }
 
         public Result<Dictionary<string, double>> GetParameters(int id)
         {
-            return new Result<Dictionary<string, double>> { Success = false, Value = null };
+            return new Result<Dictionary<string, double>> { Success = false, Data = null };
         }
 
         private OutputModel Calculate(string input)
         {
             var sample = new WRCParams(input);
-            sample.WRCModel = null;
-            sample.CalculateParams();
-            sample.CalculateWaterContents();
-            sample.CalculateStatistics();
+            if (sample.WRCModel != null)
+            {
+                sample.CalculateParams();
+                sample.CalculateWaterContents();
+                sample.CalculateStatistics();
+            }
+            else
+            {
+                throw new Exception("Failed to read input string.");
+            }
 
             return sample.ToOuputModel();
         }

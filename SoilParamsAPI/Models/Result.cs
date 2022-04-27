@@ -2,7 +2,8 @@
 {
     public class Result<T>
     {
-        public bool Success { get; set; } = true;
-        public T    Value   { get; set;  }
+        public bool     Success { get; set; } = true;
+        public string   Message { get; set; } = "";
+        public T        Data   { get; set;  }
     }
 }
