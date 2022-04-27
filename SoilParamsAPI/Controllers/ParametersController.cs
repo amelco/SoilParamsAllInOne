@@ -27,17 +27,17 @@ namespace SoilParamsAPI.Controllers
         /// <param name="id">Identification number of the soil sample</param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public Result<string> Get(int id)
+        public Result<Dictionary<string,double>> Get(int id)
         {
             var res = _service.GetParameters(id);
-            return new Result<string> { Value = $"Yet to be done\n{res.Values.FirstOrDefault()}" };
+            return res;
         }
 
         [HttpPost]
         public Result<OutputModel> Post([FromBody] InputQueryParameters input)
         {
             var res = _service.CalculateParameters(input);
-            return new Result<OutputModel> { Value = res };
+            return res;
 
         }
 

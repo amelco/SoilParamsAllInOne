@@ -12,20 +12,29 @@ namespace SoilParamsAPI.Services
 {
     public class ParameterService : IParameterService
     {
-        public OutputModel CalculateParameters(InputQueryParameters input)
+        public Result<OutputModel> CalculateParameters(InputQueryParameters input)
         {
-            var res = this.Calculate(JsonSerializer.Serialize(input));
-            return res;
+            OutputModel res;
+            try
+            {
+                res = this.Calculate(JsonSerializer.Serialize(input));
+            }
+            catch 
+            {
+                return new Result<OutputModel> { Success = false, Value = null };
+            }
+            return new Result<OutputModel> { Value = res };
         }
 
-        public Dictionary<string, double> GetParameters(int id)
+        public Result<Dictionary<string, double>> GetParameters(int id)
         {
-            return new Dictionary<string, double> { {"parameter_test", 2.34 } };
+            return new Result<Dictionary<string, double>> { Success = false, Value = null };
         }
 
         private OutputModel Calculate(string input)
         {
             var sample = new WRCParams(input);
+            sample.WRCModel = null;
             sample.CalculateParams();
             sample.CalculateWaterContents();
             sample.CalculateStatistics();

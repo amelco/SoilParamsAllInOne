@@ -5,7 +5,7 @@ namespace SoilParamsAPI.Interfaces
 {
     public interface IParameterService
     {
-        Dictionary<string, double> GetParameters(int id);
-        OutputModel                CalculateParameters(InputQueryParameters input);
+        Result<Dictionary<string, double>> GetParameters(int id);
+        Result<OutputModel>                CalculateParameters(InputQueryParameters input);
     }
 }
